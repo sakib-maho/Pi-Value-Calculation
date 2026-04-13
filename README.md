@@ -17,7 +17,7 @@ The notebook is preserved, and the codebase now includes package modules, CLI, a
 - CLI entrypoint for quick experiments
 - Unit tests for estimator and CLI
 
-## Usage
+## Quick Start
 
 ```bash
 python3 cli.py --samples 10000
