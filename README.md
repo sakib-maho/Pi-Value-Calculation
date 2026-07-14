@@ -1,34 +1,72 @@
-# PI Value Calculation Showcase
+# Monte Carlo Pi
 
-<!-- BrandCloud:readme-standard -->
-[![Maintained](https://img.shields.io/badge/Maintained-yes-brightgreen.svg)](#)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Showcase](https://img.shields.io/badge/Portfolio-Showcase-blue.svg)](#)
+`monte-carlo-pi` estimates `math.pi` by randomly throwing points into a square and
+measuring how many fall inside the inscribed circle. It is a compact teaching repo
+for probability, simulation, and CLI-friendly experimentation.
 
-_Part of the `sakib-maho` project showcase series with consistent documentation and quality standards._
+## How It Works
 
-This repository is upgraded into a reproducible Monte Carlo PI estimation project.
-The notebook is preserved, and the codebase now includes package modules, CLI, and tests.
+For each sample, the program picks an `(x, y)` point uniformly from `[-1, 1]`.
+Points inside the unit circle satisfy `x^2 + y^2 <= 1`. The ratio of inside points
+to all points approximates the circle-to-square area ratio:
+
+`inside / total ~= pi / 4`
+
+So the estimator is:
+
+`pi ~= 4 * inside / total`
+
+As the sample count increases, the estimate usually converges toward `math.pi`.
 
 ## Features
 
-- Monte Carlo PI estimation with configurable sample count
-- Deterministic seeding support for repeatable runs
-- CLI entrypoint for quick experiments
-- Unit tests for estimator and CLI
+- Deterministic `estimate_pi(samples, seed)` helper
+- History snapshots with absolute error tracking
+- Multi-seed aggregate statistics for quick stability checks
+- Optional CSV export for convergence analysis
+- CLI that reports the error versus `math.pi`
+- Thorough tests for library functions and command behavior
 
-## Quick Start
+## CLI Examples
 
 ```bash
-python3 cli.py --samples 10000
+python3 cli.py --samples 100000 --seed 7
+python3 cli.py --samples 50000 --seed 7 --history 100,1000,10000,50000
+python3 cli.py --samples 50000 --history 100,1000,10000 --csv out/history.csv
+python3 cli.py --samples 20000 --seeds 1,2,3,4,5
 ```
 
-## Tests
+Example output:
+
+```text
+estimate=3.136400
+error_vs_math_pi=0.005193
+history[100]=3.080000 error=0.061593
+history[1000]=3.180000 error=0.038407
+```
+
+## Python API
+
+```python
+from pi_calc.monte_carlo import (
+    estimate_pi,
+    estimate_pi_with_history,
+    export_history_to_csv,
+    multi_seed_stats,
+)
+
+estimate = estimate_pi(100_000, seed=42)
+estimate, history = estimate_pi_with_history(50_000, seed=42, checkpoints=[100, 1000, 10_000])
+stats = multi_seed_stats(20_000, seeds=[1, 2, 3, 4, 5])
+export_history_to_csv(history, "history.csv")
+```
+
+## Run Tests
 
 ```bash
-python3 -m unittest discover -s tests -p "test_*.py"
+python3 -m pytest -q
 ```
 
 ## License
 
-MIT License. See `LICENSE`.
+MIT. See `LICENSE`.
